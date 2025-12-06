@@ -4,7 +4,7 @@ Rest API with Node.js
 ```bash
 
 API/
-├── node_modules/ # Project dependencies (auto-generated, not in version control)
+├── node_modules/ # Project dependencies (auto-generated)
 ├── src/ # Source code directory
 │ ├── controllers/ # Business logic and request handlers
 │ │ └── authController.js # Handles authentication logic
