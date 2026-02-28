@@ -1,0 +1,91 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "extends": ["config:recommended"],
+
+  // ── Who to notify ───────────────────────────────────────────────────────────
+  "assignees": ["eliaatram"],
+  "labels": ["dependencies"],
+
+  // ── PR limits ───────────────────────────────────────────────────────────────
+  "prConcurrentLimit": 5,
+  "schedule": ["before 6am on Monday"],
+
+  // ── Semver strategy ─────────────────────────────────────────────────────────
+  "separateMajorMinor": true,
+
+  // ── Package rules ───────────────────────────────────────────────────────────
+  "packageRules": [
+    // 1. Group all minor + patch updates into ONE PR (prod deps)
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchDepTypes": ["dependencies"],
+      "groupName": "production dependencies (minor + patch)",
+      "groupSlug": "prod-minor-patch"
+    },
+
+    // 2. Major updates for production deps → individual PR + review label
+    {
+      "matchUpdateTypes": ["major"],
+      "matchDepTypes": ["dependencies"],
+      "labels": ["dependencies", "major-update"],
+      "addLabels": ["needs-review"],
+      "prPriority": 5
+    },
+
+    // 3. Dev dependencies (minor + patch) → automerge when CI passes
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "dev dependencies (minor + patch)",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+
+    // 4. TypeScript major bumps require manual review (if present)
+    {
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "enabled": true,
+      "addLabels": ["needs-review", "typescript-major"]
+    },
+
+    // 5. GitHub Actions versions — keep them updated too
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+
+    // ── Project-specific note ────────────────────────────────────────────────
+    // Explicitly keep the main runtime deps visible in the grouped prod PRs
+    // (dotenv, express, better-sqlite3) while nodemon stays a devDependency.
+    {
+      "matchPackageNames": ["dotenv", "express", "better-sqlite3"],
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "production dependencies (minor + patch)",
+      "groupSlug": "prod-minor-patch"
+    },
+    {
+      "matchPackageNames": ["nodemon"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "dev dependencies (minor + patch)",
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    }
+  ],
+
+  // ── Commit message format ────────────────────────────────────────────────────
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+
+  // ── Dependency Dashboard ────────────────────────────────────────────────────
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "🤖 Renovate Dependency Dashboard"
+}
