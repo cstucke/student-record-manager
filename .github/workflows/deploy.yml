@@ -53,6 +53,6 @@ jobs:
 
       - name: Deploy to Railway
         if: github.event_name == 'push'
-        run: railway up --service ${{ secrets.RAILWAY_SERVICE }} --detach
+        run: railway redeploy --service ${{ secrets.RAILWAY_SERVICE }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
